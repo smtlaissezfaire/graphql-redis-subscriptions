@@ -171,16 +171,18 @@ export class RedisPubSub implements PubSubEngine {
   private readonly subsRefsMap: { [trigger: string]: Array<number> };
   private currentSubscriptionId: number;
 
-  private onMessage(pattern: string, channel: string, message: string) {
+  private async onMessage(pattern: string, channel: string, message: string) {
     const subscribers = this.subsRefsMap[pattern || channel];
 
     // Don't work for nothing..
     if (!subscribers || !subscribers.length) return;
 
+    console.log("in lib!!!!!!!!!!!!!!");
+
     let parsedMessage;
     try {
       parsedMessage = this.deserializer
-        ? this.deserializer(message, { pattern, channel })
+        ? await this.deserializer(message, { pattern, channel })
         : JSON.parse(message, this.reviver);
     } catch (e) {
       parsedMessage = message;
